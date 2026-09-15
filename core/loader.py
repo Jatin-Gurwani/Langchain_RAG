@@ -16,6 +16,7 @@ from datetime import datetime
 from os import getenv, path,listdir
 from typing import List
 from config import get_settings
+from tempfile import TemporaryDirectory
 
 settings = get_settings()
 Skip_Extensions = {'.zip','.tar','.7z','.png', '.jpg', '.gif', '.lock', '.ico', '.woff', '.ttf', '.pyc','.venv','.mp4','.wav','.mkv','.python-version'}
@@ -79,8 +80,9 @@ class SmartLoaderManager:
                 self.docs_loaded.extend(cur_docs)
                 
     def fetch_git_repo(self,repo_link:str,repo_name:str,branch='main'):
-        git_loader = GitLoader(repo_path=path.join(local_repo_path,repo_name),clone_url=repo_link,branch=branch)
-        docs = git_loader.load()
+        with TemporaryDirectory() as tempdir :
+            git_loader = GitLoader(repo_path=path.join(tempdir,repo_name),clone_url=repo_link,branch=branch)
+            docs = git_loader.load()
         filter_docs = [doc for doc in  docs if doc.metadata.get('file_type') not in Skip_Extensions]
         print(f"{datetime.now()} Total  Documents -> {len(docs)}")
         print(f"{datetime.now()} Documents after filtered -> {len(filter_docs)}")

@@ -10,3 +10,4 @@ wheels/
 .venv
 test.py
 .env
+chroma_vector_db/

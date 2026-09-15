@@ -123,7 +123,6 @@ async def ingest_git(request_data:ingest_request_model):
     git_docs = loader.fetch_git_repo(
         repo_link=request_data.git_url, repo_name=request_data.git_url[:-4].split("/")[-1]
     )
-    loader.docs_loaded.extend(git_docs)
 
     docs_len = len(
         {docs.metadata.get("file_name", "unknown") for docs in loader.docs_loaded}

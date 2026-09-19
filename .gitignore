@@ -11,3 +11,4 @@ wheels/
 test.py
 .env
 chroma_vector_db/
+bm25_store/

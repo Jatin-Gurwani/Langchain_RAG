@@ -48,11 +48,14 @@ class Settings(BaseSettings):
     qdrant_sparse_vector_name: str = "sparse"
     sparse_embedding_model: str | None = "Qdrant/bm25"  # Optional for hybrid search
     fastembed_cache_dir: str | None = "/app/.cache/fastembed"
+    hybrid_prefetch_limit: int = 50
+    rrf_k: int = 2
 
     # Local storage paths
     local_path: str = "./"
     chroma_db_path: str = "./chroma_vector_db/"
     local_repo_path: str = "./repo/"
+    bm25_store_path: str = "./bm25_store/"
 
     # Filter metadata fields (if used with hybrid search)
     matadata_filter_allowed: list[str] | None = ['file_type', 'file_name']

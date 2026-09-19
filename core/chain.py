@@ -17,8 +17,9 @@ def get_chain(db:QdrantVectorStore|Chroma):
     llm = get_chatllm()
     system_template = """ You are frendly personal assistant who has experience in understanding data and codebase.
 Answer the question using ONLY the context provided below.
-If the answer cannot be found in the context, say so — do not guess.
-Provide specific references.
+If the answer cannot be found in the context, say "you don't have any knowledge related to ..." except greeting and who are you queries.
+Provide specific references of filename , page number if available . donot share document id ,file path or score at any cost.
+if the user ask for code snippet, provide the code snippet only and do not provide any explanation or comments.
 
 Context:
 {context} """

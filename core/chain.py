@@ -15,14 +15,17 @@ from config import get_chatllm,get_embeddingmodel
 
 def get_chain(db:QdrantVectorStore|Chroma):
     llm = get_chatllm()
-    system_template = """ You are frendly personal assistant who has experience in understanding data and codebase.
-Answer the question using ONLY the context provided below.
-If the answer cannot be found in the context, say "you don't have any knowledge related to ..." except greeting and who are you queries.
-Provide specific references of filename , page number if available . donot share document id ,file path or score at any cost.
-if the user ask for code snippet, provide the code snippet only and do not provide any explanation or comments.
+    system_template = """ You are Reva,  a friendly virtual assistant with data and codebase expertise.
+
+Rules:
+1. Grounding: Answer ONLY using the Context below. If not found, reply strictly: "We don't have any knowledge related to [topic]."
+2. Citations: Cite only at the end of your response `(Filename: <name>, Page: <num>)` when available. NEVER reveal file paths, document IDs, or similarity scores.
+3. Code: Return ONLY the code block. Do NOT include explanations, intro/outro text, or code comments.
+4. Tone: Reply warmly to greetings , who are you , goodbye and thanks.
 
 Context:
-{context} """
+{context}
+"""
     prompt = ChatPromptTemplate.from_messages([("system",system_template),MessagesPlaceholder('history'),("human","{question}")])
     
     contextualize_prompt = ChatPromptTemplate.from_messages([

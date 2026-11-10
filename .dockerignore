@@ -1,0 +1,13 @@
+.venv
+test.py
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+chroma_vector_db/
+bm25_store/
+.env
+.vscode/

@@ -27,10 +27,17 @@ def root():
 
 
 
-async def _check_chatllm(timeout: float = 3.0) -> bool:
+async def _check_chatllm(timeout: float = 10.0) -> bool:
     try:
         llm = get_chatllm()
-        await asyncio.wait_for(llm.bind(max_tokens=1).ainvoke("ping"), timeout=timeout)
+        if hasattr(llm, "max_output_tokens"):
+            bound_llm = llm.bind(max_output_tokens=1)
+        else:
+            try:
+                bound_llm = llm.bind(max_tokens=1)
+            except Exception:
+                bound_llm = llm
+        await asyncio.wait_for(bound_llm.ainvoke("ping"), timeout=timeout)
         return True
     except Exception:
         try:
@@ -41,7 +48,7 @@ async def _check_chatllm(timeout: float = 3.0) -> bool:
 
 
 
-async def _check_embedding(timeout: float = 1.0) -> bool:
+async def _check_embedding(timeout: float = 5.0) -> bool:
     try:
         embedd = get_embeddingmodel()
         await asyncio.wait_for(embedd.aembed_query("ping"), timeout=timeout)
@@ -50,10 +57,17 @@ async def _check_embedding(timeout: float = 1.0) -> bool:
         return False
 
 
-async def _check_vectordb(timeout: float = 1.0) -> bool:
+async def _check_vectordb(timeout: float = 5.0) -> bool:
     try:
         client = get_vectordb_client()
-        await asyncio.wait_for(asyncio.to_thread(client.get_collections), timeout=timeout)
+        if hasattr(client, "heartbeat"):
+            await asyncio.wait_for(asyncio.to_thread(client.heartbeat), timeout=timeout)
+        elif hasattr(client, "get_collections"):
+            await asyncio.wait_for(asyncio.to_thread(client.get_collections), timeout=timeout)
+        elif hasattr(client, "list_collections"):
+            await asyncio.wait_for(asyncio.to_thread(client.list_collections), timeout=timeout)
+        else:
+            await asyncio.wait_for(asyncio.to_thread(get_collection_list), timeout=timeout)
         return True
     except Exception:
         return False

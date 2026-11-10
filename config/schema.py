@@ -9,11 +9,11 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # Valid providers for each type
-CHAT_LLM_PROVIDERS = Literal["ollama", "google", "openai", "lmstudio"]
-EMBEDDING_PROVIDERS = Literal["ollama", "google", "openai","lmstudio"]
+CHAT_LLM_PROVIDERS = Literal["ollama", "google", "openai", "private"]
+EMBEDDING_PROVIDERS = Literal["ollama", "google", "openai","private"]
 
-VALID_CHAT_PROVIDERS: set = {"ollama", "google", "openai", "lmstudio"}
-VALID_EMBEDDING_PROVIDERS: set = {"ollama", "google", "openai","lmstudio"}
+VALID_CHAT_PROVIDERS: set = {"ollama", "google", "openai", "private"}
+VALID_EMBEDDING_PROVIDERS: set = {"ollama", "google", "openai","private"}
 
 
 class Settings(BaseSettings):
@@ -80,7 +80,7 @@ def get_chatllm() -> ChatOpenAI | ChatOllama | ChatGoogleGenerativeAI:
         - ollama: Uses Ollama API (default, requires BASE_URL to be set)
         - openai: Uses OpenAI-compatible API (requires OPENAI_API_KEY env var)
         - google: Uses Google Generative AI (requires GOOGLE_API_KEY env var)
-        - lmstudio: Uses LM Studio via OpenAI-compatible API
+        - private: Uses LM Studio via OpenAI-compatible API
     
     Returns:
         ChatOpenAI, ChatOllama, or ChatGoogleGenerativeAI instance ready for use.
@@ -107,14 +107,14 @@ def get_chatllm() -> ChatOpenAI | ChatOllama | ChatGoogleGenerativeAI:
         "ollama": ChatOllama,
         "openai": ChatOpenAI,
         "google": ChatGoogleGenerativeAI,
-        "lmstudio": ChatOpenAI,  # LM Studio uses OpenAI API format
+        "private": ChatOpenAI,  # LM Studio uses OpenAI API format
     }
     
     api_keys = {
         "google": "GOOGLE_API_KEY",
         "openai": "OPENAI_API_KEY",
         "ollama": None,  # Ollama typically doesn't require API key
-        "lmstudio": None,  # LM Studio uses local instance
+        "private": None,  # LM Studio uses local instance
     }
     
     llm_class = llm_classes[settings.chatllm_provider]
@@ -139,7 +139,7 @@ def get_chatllm() -> ChatOpenAI | ChatOllama | ChatGoogleGenerativeAI:
     }
     
     # Add base_url for Ollama and LM Studio (which use local endpoints)
-    if settings.chatllm_provider in ("ollama", "lmstudio"):
+    if settings.chatllm_provider in ("ollama", "private"):
         kwargs["base_url"] = settings.chatllm_base_url
     
     # Add temperature/deterministic settings (optional defaults)
@@ -183,14 +183,14 @@ def get_embeddingmodel() -> OpenAIEmbeddings | OllamaEmbeddings | GoogleGenerati
         "ollama": OllamaEmbeddings,
         "openai": OpenAIEmbeddings,
         "google": GoogleGenerativeAIEmbeddings,
-        "lmstudio": OpenAIEmbeddings
+        "private": OpenAIEmbeddings
     }
     
     api_keys = {
         "google": "GOOGLE_API_KEY",
         "openai": "OPENAI_API_KEY",
         "ollama": None,
-        "lmstudio": None    # Ollama/LM Studio typically doesn't require API key
+        "private": None    # Ollama/LM Studio typically doesn't require API key
     }
     
     embedding_class = embedding_classes[settings.embedding_provider]
@@ -216,7 +216,7 @@ def get_embeddingmodel() -> OpenAIEmbeddings | OllamaEmbeddings | GoogleGenerati
     }
     
     # Add base_url for Ollama
-    if settings.embedding_provider in ["ollama",'lmstudio']:
+    if settings.embedding_provider in ["ollama",'private']:
         kwargs["base_url"] = settings.embedding_base_url
     
     return embedding_class(**kwargs)
